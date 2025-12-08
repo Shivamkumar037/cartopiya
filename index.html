@@ -2,13 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartopiya - Shop Online</title>
-    <!-- Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cartopiya Shop</title>
+    
+    <!-- 1. Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
+    
+    <!-- 2. FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Toastify for alerts -->
+    
+    <!-- 3. Toastify Notifications -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
@@ -17,9 +20,8 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#059669', // Emerald 600 - Main Green
+                        primary: '#059669',
                         secondary: '#10b981',
-                        dark: '#064e3b',
                     }
                 }
             }
@@ -27,318 +29,319 @@
     </script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        /* Smooth Fade Animation */
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        body { font-family: sans-serif; background-color: #f8fafc; user-select: none; -webkit-tap-highlight-color: transparent; }
+        
+        /* Custom Loader */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #059669;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
         }
-        /* Loader */
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #059669; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Hide Scrollbar */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Force Hide/Show Utility */
+        .d-none { display: none !important; }
+        .d-flex { display: flex !important; }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-slate-800">
 
-    <!-- ================= 1. LOGIN SCREEN ================= -->
-    <div id="login-screen" class="fixed inset-0 z-[60] bg-white flex flex-col items-center justify-center p-6 hidden">
+    <!-- CRITICAL: Fallback message if JS is disabled -->
+    <noscript>
+        <div style="padding: 20px; text-align: center; color: red;">
+            Please enable JavaScript to use this app.
+        </div>
+    </noscript>
+
+    <!-- LOADING SCREEN (Visible by default, removed by JS) -->
+    <div id="initial-loader" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
+        <div class="spinner mb-4"></div>
+        <h2 class="text-lg font-bold text-slate-700">Loading App...</h2>
+        <p class="text-xs text-slate-400 mt-2">v1.2 Stable</p>
+        <button onclick="localStorage.clear(); location.reload()" class="mt-8 text-xs text-red-400 underline">Stuck? Click to Reset</button>
+    </div>
+
+    <!-- 1. LOGIN SCREEN (Hidden initially via CSS) -->
+    <div id="login-screen" class="d-none fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6">
         <div class="w-full max-w-sm">
-            <div class="flex flex-col items-center mb-8">
-                <div class="bg-primary text-white p-4 rounded-2xl shadow-lg mb-4">
-                    <i class="fa-solid fa-bag-shopping text-4xl"></i>
+            <div class="flex flex-col items-center mb-10">
+                <div class="bg-primary text-white p-4 rounded-full shadow-lg mb-4">
+                    <i class="fa-solid fa-bag-shopping text-3xl"></i>
                 </div>
-                <h1 class="text-3xl font-bold text-gray-800 tracking-wide">Cartopiya</h1>
-                <p class="text-gray-500 text-sm mt-1">Shopping made simple</p>
+                <h1 class="text-3xl font-bold text-slate-800">Cartopiya</h1>
+                <p class="text-slate-500">Welcome Back</p>
             </div>
 
-            <form onsubmit="handleLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-user absolute left-3 top-3.5 text-gray-400"></i>
-                        <input type="text" id="login-name" required placeholder="Enter your name" 
-                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition bg-gray-50">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-phone absolute left-3 top-3.5 text-gray-400"></i>
-                        <input type="tel" id="login-mobile" required pattern="[0-9]{10}" placeholder="Enter 10 digit mobile" 
-                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition bg-gray-50">
-                    </div>
-                </div>
-                <button type="submit" id="login-btn" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-lg shadow-green-200 hover:bg-green-700 transition transform active:scale-95">
-                    Login
+            <form onsubmit="handleLogin(event)" class="space-y-4 w-full">
+                <input type="text" id="login-name" required placeholder="Enter Full Name" 
+                    class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-primary outline-none">
+                
+                <input type="tel" id="login-mobile" required pattern="[0-9]{10}" placeholder="Mobile Number" 
+                    class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-primary outline-none">
+                
+                <button type="submit" id="login-btn" class="w-full bg-primary text-white font-bold py-3 rounded-lg shadow-lg active:scale-95 transition">
+                    Start Shopping
                 </button>
             </form>
-            <p class="text-center text-xs text-gray-400 mt-6">By logging in, you agree to our Terms & Conditions.</p>
         </div>
     </div>
 
-    <!-- ================= 2. APP LAYOUT (Hidden until login) ================= -->
-    <div id="app-layout" class="hidden min-h-screen pb-20 md:pb-0">
+    <!-- 2. MAIN APP (Hidden initially via CSS) -->
+    <div id="app-layout" class="d-none min-h-screen flex flex-col pb-20 md:pb-0">
         
-        <!-- HEADER -->
-        <header class="bg-primary text-white sticky top-0 z-50 shadow-md">
-            <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-                <!-- Logo -->
-                <div class="flex items-center gap-2 cursor-pointer" onclick="router('home')">
-                    <i class="fa-solid fa-bag-shopping text-xl"></i>
-                    <h1 class="text-lg font-bold hidden sm:block">Cartopiya</h1>
-                </div>
+        <!-- Header -->
+        <header class="bg-white sticky top-0 z-40 border-b px-4 py-3 flex justify-between items-center shadow-sm">
+            <div class="flex items-center gap-2 font-bold text-lg text-primary">
+                <i class="fa-solid fa-bag-shopping"></i> Cartopiya
+            </div>
+            
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
+                <button onclick="router('home')" class="hover:text-primary">Home</button>
+                <button onclick="router('orders')" class="hover:text-primary">Orders</button>
+                <button onclick="router('cart')" class="hover:text-primary">Cart</button>
+                <button onclick="handleLogout()" class="text-red-500">Logout</button>
+            </div>
 
-                <!-- Search Bar -->
-                <div class="flex-1 max-w-lg relative">
-                    <input type="text" id="search-input" onkeyup="handleSearch()" 
-                        placeholder="Search products..." 
-                        class="w-full py-2 pl-9 pr-4 rounded-lg text-gray-800 text-sm focus:outline-none shadow-inner bg-white/95">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400"></i>
-                </div>
-
-                <!-- Desktop Nav -->
-                <div class="hidden md:flex items-center gap-6 text-sm font-medium">
-                    <button onclick="router('home')" class="hover:text-green-200">Home</button>
-                    <button onclick="router('orders')" class="hover:text-green-200">My Orders</button>
-                    <button onclick="router('cart')" class="hover:text-green-200 relative">
-                        <i class="fa-solid fa-cart-shopping text-lg"></i>
-                        <span id="badge-desktop" class="absolute -top-2 -right-2 bg-red-500 text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
-                    </button>
-                    <button onclick="router('account')" class="hover:text-green-200">Account</button>
-                </div>
+            <!-- Mobile User Icon -->
+            <div class="md:hidden w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-primary" onclick="router('account')">
+                <i class="fa-solid fa-user"></i>
             </div>
         </header>
 
-        <!-- MAIN PAGES CONTAINER -->
-        <main class="max-w-7xl mx-auto p-4">
-
-            <!-- PAGE: HOME -->
-            <div id="home" class="page-section fade-in">
-                <!-- Banner -->
-                <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl p-5 mb-6 text-white shadow-lg relative overflow-hidden">
-                    <div class="relative z-10">
-                        <h2 class="text-2xl font-bold">Welcome Back!</h2>
-                        <p class="text-green-100 text-sm mb-3">Check out the latest products fetched for you.</p>
-                    </div>
-                    <i class="fa-brands fa-shopify absolute -right-6 -bottom-6 text-9xl opacity-10"></i>
+        <!-- Content Area -->
+        <main class="flex-grow p-4 max-w-6xl mx-auto w-full">
+            
+            <!-- SECTION: HOME -->
+            <div id="home" class="page-section">
+                <!-- Search -->
+                <div class="relative mb-6">
+                    <i class="fa-solid fa-search absolute left-3 top-3.5 text-slate-400"></i>
+                    <input type="text" id="search-input" onkeyup="handleSearch()" placeholder="Search products..." class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl shadow-sm outline-none focus:border-primary">
                 </div>
 
-                <!-- Loading State -->
-                <div id="loader-container" class="flex flex-col items-center justify-center py-10">
-                    <div class="loader mb-2"></div>
-                    <p class="text-gray-500 text-sm">Loading products...</p>
+                <!-- Products Grid -->
+                <div id="product-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- JS fills this -->
                 </div>
 
-                <!-- Product Grid -->
-                <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 hidden">
-                    <!-- JS Injected Items -->
-                </div>
-
-                <!-- No Data State -->
-                <div id="no-data-msg" class="hidden flex flex-col items-center justify-center py-20 text-center">
-                    <i class="fa-solid fa-box-open text-4xl text-gray-300 mb-2"></i>
-                    <p class="text-gray-600 font-semibold">Data Not Available</p>
-                    <p class="text-xs text-gray-400">Try searching for something else.</p>
-                </div>
+                <!-- Loaders / Messages -->
+                <div id="grid-loader" class="py-10 text-center text-slate-500 hidden">Loading Products...</div>
+                <div id="no-data" class="py-10 text-center text-slate-400 hidden">No products found.</div>
             </div>
 
-            <!-- PAGE: PRODUCT DETAILS -->
-            <div id="product-details" class="page-section hidden">
-                <button onclick="router('home')" class="mb-4 text-gray-500 hover:text-primary flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-left"></i> Back
-                </button>
+            <!-- SECTION: DETAILS -->
+            <div id="product-details" class="page-section d-none">
+                <button onclick="router('home')" class="mb-4 bg-white px-3 py-1 rounded border text-sm"><i class="fa-solid fa-arrow-left"></i> Back</button>
                 <div id="detail-container"></div>
             </div>
 
-            <!-- PAGE: CART -->
-            <div id="cart" class="page-section hidden">
-                <h2 class="text-xl font-bold mb-4">My Cart <span class="text-sm font-normal text-gray-500">(Saved Items)</span></h2>
+            <!-- SECTION: CART -->
+            <div id="cart" class="page-section d-none">
+                <h2 class="text-xl font-bold mb-4">My Cart <span id="cart-count-badge" class="text-sm font-normal text-slate-500">(0)</span></h2>
                 <div id="cart-list" class="space-y-3"></div>
-                <div id="cart-empty" class="hidden py-10 text-center text-gray-500">
-                    <i class="fa-solid fa-cart-plus text-4xl mb-2 text-gray-300"></i>
-                    <p>Your cart is empty.</p>
-                </div>
+                <div id="cart-empty" class="py-10 text-center text-slate-400 hidden">Your cart is empty.</div>
             </div>
 
-            <!-- PAGE: MY ORDERS (History) -->
-            <div id="orders" class="page-section hidden">
-                <h2 class="text-xl font-bold mb-4">Order History</h2>
+            <!-- SECTION: ORDERS -->
+            <div id="orders" class="page-section d-none">
+                <h2 class="text-xl font-bold mb-4">History</h2>
                 <div id="order-list" class="space-y-3"></div>
-                <div id="order-empty" class="hidden py-10 text-center text-gray-500">
-                    <i class="fa-solid fa-clock-rotate-left text-4xl mb-2 text-gray-300"></i>
-                    <p>No history yet.</p>
-                </div>
+                <div id="order-empty" class="py-10 text-center text-slate-400 hidden">No history found.</div>
             </div>
 
-            <!-- PAGE: ACCOUNT -->
-            <div id="account" class="page-section hidden">
-                <div class="max-w-md mx-auto bg-white rounded-xl shadow-sm border overflow-hidden">
-                    <div class="bg-primary p-6 text-center text-white">
-                        <div class="w-20 h-20 bg-white rounded-full mx-auto mb-3 flex items-center justify-center text-primary text-3xl font-bold shadow-md">
-                            <i class="fa-solid fa-user"></i>
-                        </div>
-                        <h2 id="profile-name" class="text-xl font-bold">User Name</h2>
-                        <p id="profile-mobile" class="text-green-100 text-sm">Mobile</p>
+            <!-- SECTION: ACCOUNT -->
+            <div id="account" class="page-section d-none">
+                <div class="bg-white p-6 rounded-xl shadow-sm border text-center">
+                    <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl text-primary font-bold">
+                        <i class="fa-solid fa-user"></i>
                     </div>
-                    <div class="p-2">
-                        <div onclick="router('orders')" class="flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b">
-                            <span class="flex items-center gap-3"><i class="fa-solid fa-clock-rotate-left text-blue-500"></i> Order History</span>
-                            <i class="fa-solid fa-chevron-right text-gray-400"></i>
-                        </div>
-                        <div onclick="router('cart')" class="flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer border-b">
-                            <span class="flex items-center gap-3"><i class="fa-solid fa-cart-shopping text-orange-500"></i> Saved Cart</span>
-                            <i class="fa-solid fa-chevron-right text-gray-400"></i>
-                        </div>
-                        <div onclick="handleLogout()" class="flex items-center justify-between p-4 hover:bg-red-50 cursor-pointer text-red-500 mt-2">
-                            <span class="flex items-center gap-3"><i class="fa-solid fa-right-from-bracket"></i> Logout</span>
-                        </div>
-                    </div>
+                    <h2 id="user-name-disp" class="text-xl font-bold">User</h2>
+                    <p id="user-mobile-disp" class="text-slate-500 text-sm">Mobile</p>
+                    <button onclick="handleLogout()" class="mt-6 w-full bg-red-50 text-red-500 py-2 rounded-lg font-bold">Logout</button>
                 </div>
             </div>
-
         </main>
 
-        <!-- MOBILE NAV BAR -->
-        <nav class="md:hidden fixed bottom-0 w-full bg-white border-t flex justify-around py-2 z-50 text-[10px] font-medium text-gray-500 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-            <div onclick="router('home')" class="nav-item flex flex-col items-center gap-1 w-full p-2 cursor-pointer">
-                <i class="fa-solid fa-house text-lg"></i> Home
+        <!-- Mobile Bottom Nav -->
+        <nav class="md:hidden fixed bottom-0 w-full bg-white border-t flex justify-around py-2 z-50 text-[10px] text-slate-500 shadow-lg">
+            <div onclick="router('home')" class="nav-btn flex flex-col items-center p-2 w-full">
+                <i class="fa-solid fa-house text-lg mb-1"></i> Home
             </div>
-            <div onclick="router('cart')" class="nav-item flex flex-col items-center gap-1 w-full p-2 cursor-pointer relative">
-                <i class="fa-solid fa-cart-shopping text-lg"></i> Cart
-                <span id="badge-mobile" class="absolute top-1 right-6 bg-red-500 text-white w-3 h-3 rounded-full flex items-center justify-center text-[8px] hidden">0</span>
+            <div onclick="router('cart')" class="nav-btn flex flex-col items-center p-2 w-full relative">
+                <i class="fa-solid fa-cart-shopping text-lg mb-1"></i> Cart
+                <span id="mobile-cart-badge" class="absolute top-1 right-6 bg-red-500 text-white w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
             </div>
-            <div onclick="router('orders')" class="nav-item flex flex-col items-center gap-1 w-full p-2 cursor-pointer">
-                <i class="fa-solid fa-box text-lg"></i> Orders
+            <div onclick="router('orders')" class="nav-btn flex flex-col items-center p-2 w-full">
+                <i class="fa-solid fa-box text-lg mb-1"></i> Orders
             </div>
-            <div onclick="router('account')" class="nav-item flex flex-col items-center gap-1 w-full p-2 cursor-pointer">
-                <i class="fa-solid fa-user text-lg"></i> Account
+            <div onclick="router('account')" class="nav-btn flex flex-col items-center p-2 w-full">
+                <i class="fa-solid fa-user text-lg mb-1"></i> Profile
             </div>
         </nav>
     </div>
 
+    <!-- JAVASCRIPT -->
     <script>
-        // --- STATE ---
-        let user = JSON.parse(localStorage.getItem('cartopiya_user')) || null;
+        // --- SAFE INITIALIZATION ---
+        // Global variables with safe defaults
+        const API_URL = "https://pdf-editor-vtsg.onrender.com";
+        let user = null;
         let products = [];
-        let cart = JSON.parse(localStorage.getItem('cartopiya_cart')) || [];
-        let history = JSON.parse(localStorage.getItem('cartopiya_history')) || [];
+        let cart = [];
+        let history = [];
 
-        // --- INIT ---
-        window.onload = function() {
-            if (user) {
-                initApp();
-            } else {
-                document.getElementById('login-screen').classList.remove('hidden');
-            }
+        // Error Handler
+        window.onerror = function(msg, url, line) {
+            alert("App Error: " + msg + "\nTry clicking 'Reset' on the loading screen.");
         };
 
-        // --- LOGIN LOGIC ---
-        async function handleLogin(e) {
+        // --- STARTUP LOGIC ---
+        window.addEventListener('load', () => {
+            try {
+                // 1. Load Data safely
+                loadLocalData();
+                
+                // 2. Hide Loader
+                document.getElementById('initial-loader').classList.add('d-none');
+
+                // 3. Route
+                if (user) {
+                    showApp();
+                } else {
+                    document.getElementById('login-screen').classList.remove('d-none');
+                }
+            } catch (e) {
+                console.error("Init Error", e);
+                // Fallback: Clear data and reload if critical fail
+                if(confirm("App data seems corrupted. Reset now?")) {
+                    localStorage.clear();
+                    location.reload();
+                }
+            }
+        });
+
+        function loadLocalData() {
+            try {
+                user = JSON.parse(localStorage.getItem('app_user'));
+                cart = JSON.parse(localStorage.getItem('app_cart')) || [];
+                history = JSON.parse(localStorage.getItem('app_history')) || [];
+            } catch (e) {
+                console.warn("Data corrupted, resetting.");
+                localStorage.clear();
+            }
+        }
+
+        // --- AUTHENTICATION ---
+        function handleLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('login-btn');
-            const originalText = btn.innerText;
-            btn.innerText = "Logging in...";
+            btn.innerText = "Please wait...";
             btn.disabled = true;
 
-            const username = document.getElementById('login-name').value;
+            const name = document.getElementById('login-name').value;
             const mobile = document.getElementById('login-mobile').value;
 
-            const userData = { username: username, mobile: mobile };
+            // Save User
+            user = { username: name, mobile: mobile };
+            localStorage.setItem('app_user', JSON.stringify(user));
 
-            try {
-                await fetch('https://pdf-editor-vtsg.onrender.com/userdata', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(userData)
-                });
-            } catch (error) {
-                console.error("Login API Error (Background):", error);
-            }
+            // Fire API (Background)
+            fetch(`${API_URL}/userdata`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(user)
+            }).catch(e => console.log("Offline login"));
 
-            user = userData;
-            localStorage.setItem('cartopiya_user', JSON.stringify(user));
-
-            btn.innerText = originalText;
-            btn.disabled = false;
-            document.getElementById('login-screen').classList.add('hidden');
-            
-            showToast(`Welcome, ${user.username}!`);
-            initApp();
+            setTimeout(() => {
+                document.getElementById('login-screen').classList.add('d-none');
+                showApp();
+            }, 800);
         }
 
         function handleLogout() {
-            localStorage.removeItem('cartopiya_user');
-            location.reload();
-        }
-
-        // --- APP LOGIC ---
-        function initApp() {
-            document.getElementById('app-layout').classList.remove('hidden');
-            updateProfileUI();
-            updateBadges();
-            fetchProductData();
-        }
-
-        function updateProfileUI() {
-            if(user) {
-                document.getElementById('profile-name').innerText = user.username;
-                document.getElementById('profile-mobile').innerText = "+91 " + user.mobile;
+            if(confirm("Logout?")) {
+                localStorage.removeItem('app_user');
+                location.reload();
             }
         }
 
-        async function fetchProductData() {
-            const loader = document.getElementById('loader-container');
-            const grid = document.getElementById('product-grid');
+        // --- CORE APP ---
+        function showApp() {
+            document.getElementById('app-layout').classList.remove('d-none');
+            document.getElementById('app-layout').classList.add('d-flex');
             
+            // Set User Info
+            document.getElementById('user-name-disp').innerText = user.username;
+            document.getElementById('user-mobile-disp').innerText = user.mobile;
+            
+            updateCartUI();
+            fetchProducts();
+        }
+
+        async function fetchProducts() {
+            const grid = document.getElementById('product-grid');
+            const loader = document.getElementById('grid-loader');
+            const noData = document.getElementById('no-data');
+
+            grid.innerHTML = '';
+            loader.classList.remove('hidden');
+            noData.classList.add('hidden');
+
             try {
-                const res = await fetch('https://pdf-editor-vtsg.onrender.com/productdata');
-                if(!res.ok) throw new Error("Failed to fetch");
+                // Timeout after 4 seconds to prevent hanging
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), 4000);
+
+                const res = await fetch(`${API_URL}/productdata`, { signal: controller.signal });
+                clearTimeout(id);
+                
+                if (!res.ok) throw new Error("API Error");
                 const data = await res.json();
                 
-                products = Array.isArray(data) ? data : [data]; 
+                products = Array.isArray(data) ? data : [data];
                 
-                renderProducts(products);
-                loader.classList.add('hidden');
-                grid.classList.remove('hidden');
+                if(products.length === 0) throw new Error("No Products");
+                renderGrid(products);
 
             } catch (error) {
-                console.error("Fetch Error:", error);
-                loader.innerHTML = <p class="text-red-500">Failed to load data.</p>;
+                console.log("Using Demo Data");
+                // DEMO DATA FALLBACK
                 products = [
-                    { id: 1, productname: "Demo Laptop", description: "Gaming Laptop (API Failed Fallback)", price: 75000, imglink: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&q=80&w=500", productlink: "https://google.com" },
-                    { id: 2, productname: "Smart Watch", description: "Fitness Tracker", price: 2500, imglink: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&q=80&w=500", productlink: "https://google.com" }
+                    { id: 1, productname: "Premium Watch", price: 2500, description: "Luxury analog watch.", imglink: "https://images.unsplash.com/photo-1524592094765-f722b2c0b055?w=400" },
+                    { id: 2, productname: "Wireless Buds", price: 1299, description: "Noise cancellation.", imglink: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400" },
+                    { id: 3, productname: "Sneakers", price: 3400, description: "Running shoes.", imglink: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" },
+                    { id: 4, productname: "Camera", price: 45000, description: "DSLR 4k.", imglink: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400" }
                 ];
-                renderProducts(products);
-                grid.classList.remove('hidden');
+                renderGrid(products);
+                if(window.Toastify) Toastify({text: "Demo Mode (Server Offline)", duration: 3000, style:{background:"#f59e0b"}}).showToast();
+            } finally {
+                loader.classList.add('hidden');
             }
         }
 
-        function renderProducts(list) {
+        function renderGrid(list) {
             const grid = document.getElementById('product-grid');
-            const noData = document.getElementById('no-data-msg');
-
             if(list.length === 0) {
-                grid.innerHTML = '';
-                noData.classList.remove('hidden');
+                document.getElementById('no-data').classList.remove('hidden');
                 return;
             }
-
-            noData.classList.add('hidden');
-            grid.innerHTML = list.map(item => `
-                <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden border border-transparent hover:border-green-100 cursor-pointer group" onclick="openDetails(${item.id})">
-                    <div class="h-40 bg-gray-100 overflow-hidden relative">
-                        <img src="${item.imglink}" onerror="this.src='https://placehold.co/400x400?text=No+Image'" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+            grid.innerHTML = list.map(p => `
+                <div class="bg-white rounded-lg shadow-sm border overflow-hidden cursor-pointer hover:shadow-md transition" onclick="showDetails(${p.id})">
+                    <div class="h-40 bg-slate-50 relative">
+                        <img src="${p.imglink}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/200'">
+                        <span class="absolute bottom-1 right-1 bg-white px-2 py-0.5 text-xs font-bold rounded shadow">₹${p.price}</span>
                     </div>
                     <div class="p-3">
-                        <h3 class="font-bold text-sm text-gray-800 line-clamp-1">${item.productname}</h3>
-                        <p class="text-xs text-gray-500 line-clamp-1 mb-2">${item.description}</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-primary font-bold">₹${item.price}</span>
-                            <button class="w-7 h-7 bg-green-50 rounded-full flex items-center justify-center text-primary text-xs">
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
-                        </div>
+                        <h3 class="font-bold text-sm truncate">${p.productname}</h3>
+                        <p class="text-xs text-slate-500 truncate">${p.description}</p>
                     </div>
                 </div>
             `).join('');
@@ -346,57 +349,44 @@
 
         // --- NAVIGATION ---
         function router(pageId) {
-            document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
-            document.getElementById(pageId).classList.remove('hidden');
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(el => el.classList.add('d-none'));
+            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('block')); // Safe cleanup
+
+            // Show target
+            const page = document.getElementById(pageId);
+            page.classList.remove('d-none');
+            page.classList.add('block');
             window.scrollTo(0,0);
 
-            document.querySelectorAll('.nav-item').forEach(el => {
-                if(el.textContent.toLowerCase().includes(pageId)) {
-                    el.classList.add('text-primary');
-                    el.classList.remove('text-gray-500');
-                } else {
-                    el.classList.remove('text-primary');
-                    el.classList.add('text-gray-500');
-                }
+            // Update Nav Icons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.innerText.toLowerCase().includes(pageId)) btn.classList.add('text-primary');
+                else btn.classList.remove('text-primary');
             });
 
             if(pageId === 'cart') renderCart();
             if(pageId === 'orders') renderHistory();
         }
 
-        // --- DETAILS & ACTIONS ---
-        function openDetails(id) {
-            const product = products.find(p => p.id === id);
+        // --- DETAILS ---
+        function showDetails(id) {
+            const product = products.find(p => p.id == id);
             if(!product) return;
-
             const link = product.productlink || '#';
 
-            
-            const clickAction = product.productlink ? saveOrderToHistory(`${product.id}`) : "alert('Link not available')";
-
-            const container = document.getElementById('detail-container');
-            container.innerHTML = `
-                <div class="bg-white rounded-2xl shadow-sm overflow-hidden pb-4">
-                    <div class="h-64 md:h-80 bg-gray-50 flex items-center justify-center">
-                        <img src="${product.imglink}" class="h-full object-contain">
+            document.getElementById('detail-container').innerHTML = `
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="h-64 bg-slate-50 flex items-center justify-center">
+                         <img src="${product.imglink}" class="h-full object-contain" onerror="this.src='https://placehold.co/400'">
                     </div>
                     <div class="p-5">
-                        <h1 class="text-2xl font-bold text-gray-900 mb-2">${product.productname}</h1>
-                        <span class="text-3xl font-bold text-primary block mb-4">₹${product.price}</span>
-                        
-                        <div class="bg-gray-50 p-4 rounded-xl mb-6">
-                            <h3 class="font-semibold text-gray-700 mb-1">Description</h3>
-                            <p class="text-gray-600 text-sm leading-relaxed">${product.description}</p>
-                        </div>
-
-                        <div class="flex gap-3 sticky bottom-0 bg-white pt-2">
-                            <button onclick="addToCart(${product.id})" class="flex-1 bg-green-100 text-green-700 py-3 rounded-xl font-bold hover:bg-green-200 transition">
-                                Add to Cart
-                            </button>
-                            <!-- Updated: Used <a> tag for reliable new tab opening -->
-                            <a href="${link}" target="_blank" onclick="${clickAction}" class="flex-1 bg-primary text-white py-3 rounded-xl font-bold shadow-lg hover:bg-green-700 transition flex items-center justify-center no-underline">
-                                Order Now
-                            </a>
+                        <h1 class="text-2xl font-bold">${product.productname}</h1>
+                        <p class="text-3xl text-primary font-bold my-2">₹${product.price}</p>
+                        <p class="text-slate-600 mb-6">${product.description}</p>
+                        <div class="flex gap-3">
+                            <button onclick="addToCart(${product.id})" class="flex-1 bg-slate-100 py-3 rounded-lg font-bold">Add to Cart</button>
+                            <a href="${link}" target="_blank" onclick="addToHistory(${product.id})" class="flex-1 bg-primary text-white flex items-center justify-center py-3 rounded-lg font-bold">Buy Now</a>
                         </div>
                     </div>
                 </div>
@@ -404,30 +394,32 @@
             router('product-details');
         }
 
-        function saveOrderToHistory(id) {
-            const product = products.find(p => p.id === id);
-            if(!product) return;
-
-            history.unshift({
-                ...product,
-                date: new Date().toLocaleDateString(),
-                time: new Date().toLocaleTimeString()
-            });
-            localStorage.setItem('cartopiya_history', JSON.stringify(history));
-
-            showToast("Added to Order History");
-            // No window.open here, let the <a> tag handle it
-        }
-
+        // --- CART & HISTORY ---
         function addToCart(id) {
-            const product = products.find(p => p.id === id);
-            cart.push(product);
-            localStorage.setItem('cartopiya_cart', JSON.stringify(cart));
-            updateBadges();
-            showToast("Added to Cart");
+            const p = products.find(x => x.id == id);
+            if(p) {
+                cart.push(p);
+                saveData();
+                updateCartUI();
+                if(window.Toastify) Toastify({text: "Added to Cart", duration: 2000, style:{background:"#059669"}}).showToast();
+            }
         }
 
-        // --- RENDER CART & HISTORY ---
+        function addToHistory(id) {
+            const p = products.find(x => x.id == id);
+            if(p) {
+                history.unshift({...p, date: new Date().toLocaleDateString()});
+                saveData();
+            }
+        }
+
+        function removeFromCart(idx) {
+            cart.splice(idx, 1);
+            saveData();
+            renderCart();
+            updateCartUI();
+        }
+
         function renderCart() {
             const list = document.getElementById('cart-list');
             const empty = document.getElementById('cart-empty');
@@ -435,101 +427,67 @@
             if(cart.length === 0) {
                 list.innerHTML = '';
                 empty.classList.remove('hidden');
-                return;
-            }
-
-            empty.classList.add('hidden');
-            list.innerHTML = cart.map((item, index) => {
-                const link = item.productlink || '#';
-                
-                const clickAction = item.productlink ? saveOrderToHistory(`${item.id}`) : "alert('Link not available')";
-                
-                return `
-                <div class="bg-white p-3 rounded-xl shadow-sm border flex gap-3 relative">
-                    <img src="${item.imglink}" class="w-20 h-20 object-cover rounded-lg bg-gray-100">
-                    <div class="flex-1">
-                        <h4 class="font-bold text-gray-800 line-clamp-1">${item.productname}</h4>
-                        <span class="text-primary font-bold">₹${item.price}</span>
-                        <div class="mt-2 flex gap-2">
-                             <a href="${link}" target="_blank" onclick="${clickAction}" class="text-xs bg-primary text-white px-3 py-1.5 rounded no-underline inline-block">Buy Now</a>
+            } else {
+                empty.classList.add('hidden');
+                list.innerHTML = cart.map((item, idx) => `
+                    <div class="bg-white p-3 rounded shadow-sm border flex gap-3 relative">
+                        <img src="${item.imglink}" class="w-16 h-16 object-cover rounded bg-slate-100">
+                        <div>
+                            <h4 class="font-bold text-sm">${item.productname}</h4>
+                            <span class="text-primary font-bold">₹${item.price}</span>
+                            <div class="mt-1"><a href="${item.productlink||'#'}" target="_blank" class="text-xs bg-slate-800 text-white px-2 py-1 rounded">Buy</a></div>
                         </div>
+                        <button onclick="removeFromCart(${idx})" class="absolute top-2 right-2 text-red-400"><i class="fa-solid fa-trash"></i></button>
                     </div>
-                    <button onclick="removeCart(${index})" class="absolute top-2 right-2 text-gray-300 hover:text-red-500">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-            `}).join('');
-        }
-
-        function removeCart(index) {
-            cart.splice(index, 1);
-            localStorage.setItem('cartopiya_cart', JSON.stringify(cart));
-            renderCart();
-            updateBadges();
+                `).join('');
+            }
         }
 
         function renderHistory() {
             const list = document.getElementById('order-list');
             const empty = document.getElementById('order-empty');
-
+            
             if(history.length === 0) {
                 list.innerHTML = '';
                 empty.classList.remove('hidden');
-                return;
-            }
-
-            empty.classList.add('hidden');
-            list.innerHTML = history.map(item => `
-                <div class="bg-white p-3 rounded-xl shadow-sm border flex gap-3 opacity-90">
-                    <img src="${item.imglink}" class="w-16 h-16 object-cover rounded-lg bg-gray-100 grayscale">
-                    <div class="flex-1">
-                        <h4 class="font-bold text-gray-800 text-sm">${item.productname}</h4>
-                        <p class="text-xs text-gray-500">Viewed/Clicked on: ${item.date}</p>
-                        <a href="${item.productlink}" target="_blank" class="text-xs text-blue-500 hover:underline mt-1 block">Visit Link Again</a>
+            } else {
+                empty.classList.add('hidden');
+                list.innerHTML = history.map(item => `
+                    <div class="bg-white p-3 rounded shadow-sm border flex gap-3 opacity-75">
+                         <img src="${item.imglink}" class="w-14 h-14 object-cover rounded bg-slate-100 grayscale">
+                         <div>
+                            <h4 class="font-bold text-sm">${item.productname}</h4>
+                            <a href="${item.productlink||'#'}" target="_blank" class="text-xs text-blue-500">Visit Link Again</a>
+                         </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
         }
 
-        // --- UTILS ---
+        function updateCartUI() {
+            const count = cart.length;
+            document.getElementById('cart-count-badge').innerText = `(${count})`;
+            const mobileBadge = document.getElementById('mobile-cart-badge');
+            if(count > 0) {
+                mobileBadge.innerText = count;
+                mobileBadge.classList.remove('hidden');
+            } else {
+                mobileBadge.classList.add('hidden');
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('app_cart', JSON.stringify(cart));
+            localStorage.setItem('app_history', JSON.stringify(history));
+        }
+
         function handleSearch() {
             const q = document.getElementById('search-input').value.toLowerCase();
-            if(q.trim() === "") {
-                renderProducts(products);
-                return;
-            }
-
-            const filtered = products.filter(p => 
-                p.productname.toLowerCase().includes(q) || 
-                p.description.toLowerCase().includes(q)
-            );
-            renderProducts(filtered);
+            const filtered = products.filter(p => p.productname.toLowerCase().includes(q));
+            renderGrid(filtered);
         }
-
-        function updateBadges() {
-            const count = cart.length;
-            const b1 = document.getElementById('badge-desktop');
-            const b2 = document.getElementById('badge-mobile');
-            
-            if(count > 0) {
-                b1.innerText = count; b1.classList.remove('hidden');
-                b2.innerText = count; b2.classList.remove('hidden');
-            } else {
-                b1.classList.add('hidden');
-                b2.classList.add('hidden');
-            }
-        }
-
-        function showToast(msg) {
-            Toastify({
-                text: msg,
-                duration: 2000,
-                gravity: "bottom",
-                position: "center",
-                style: { background: "#059669", borderRadius: "8px", fontSize: "12px" }
-            }).showToast();
-        }
-
     </script>
 </body>
 </html>
+
+

@@ -4,198 +4,125 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* Loader Animation */
         .loader {
-            border: 3px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 3px solid #3b82f6;
-            width: 24px;
-            height: 24px;
-            -webkit-animation: spin 1s linear infinite; /* Safari */
-            animation: spin 1s linear infinite;
+            border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3b82f6;
+            width: 24px; height: 24px; animation: spin 1s linear infinite;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Sidebar active state */
-        .nav-item.active { background-color: #2563eb; color: white; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .nav-item.active { background-color: #2563eb; color: white; }
+        /* Modal Overlay */
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.5); }
     </style>
 </head>
 <body class="text-slate-800 antialiased h-screen flex overflow-hidden">
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 hidden md:flex flex-col transition-all duration-300" id="sidebar">
+    <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 hidden md:flex flex-col" id="sidebar">
         <div class="h-16 flex items-center justify-center border-b border-slate-800 bg-slate-950">
-            <h1 class="text-xl font-bold text-white tracking-wide"><i class="fa-solid fa-shield-halved text-blue-500 mr-2"></i>ADMIN<span class="text-blue-500">PANEL</span></h1>
+            <h1 class="text-xl font-bold text-white">ADMIN<span class="text-blue-500">PANEL</span></h1>
         </div>
-
         <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-800 hover:text-white transition-colors">
+            <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active flex items-center px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors">
                 <i class="fa-solid fa-chart-line w-6"></i> Dashboard
             </a>
-            <a href="#" onclick="switchTab('products')" id="nav-products" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-800 hover:text-white transition-colors">
+            <a href="#" onclick="switchTab('products')" id="nav-products" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors">
                 <i class="fa-solid fa-box-open w-6"></i> Products
             </a>
-            <a href="#" onclick="switchTab('users')" id="nav-users" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-800 hover:text-white transition-colors">
+            <a href="#" onclick="switchTab('users')" id="nav-users" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors">
                 <i class="fa-solid fa-users w-6"></i> Users
             </a>
         </nav>
-
-        <div class="p-4 border-t border-slate-800">
-            <button class="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-slate-800 rounded-lg transition-colors">
-                <i class="fa-solid fa-right-from-bracket w-6"></i> Logout
-            </button>
-        </div>
     </aside>
 
-    <!-- Main Content -->
     <div class="flex-1 flex flex-col h-screen overflow-hidden">
-        
-        <!-- Header -->
         <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10">
-            <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-600 rounded-lg hover:bg-slate-100">
-                <i class="fa-solid fa-bars text-xl"></i>
-            </button>
-            <h2 class="text-lg font-semibold text-slate-700 hidden sm:block" id="page-title">Dashboard Overview</h2>
-            
-            <div class="flex items-center gap-4">
-                <div class="hidden md:flex flex-col text-right">
-                    <span class="text-sm font-bold text-slate-800">Administrator</span>
-                    <span class="text-xs text-slate-500">admin@system.com</span>
-                </div>
-                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border border-blue-200">
-                    A
-                </div>
-            </div>
+            <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-600 rounded-lg"><i class="fa-solid fa-bars text-xl"></i></button>
+            <h2 class="text-lg font-semibold text-slate-700">Dashboard</h2>
+            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border border-blue-200">A</div>
         </header>
 
-        <!-- Main Scrollable Area -->
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-100 p-6 relative">
             
-            <!-- Notification Toast -->
             <div id="toast" class="fixed top-20 right-6 z-50 transform transition-all duration-300 translate-x-full opacity-0">
                 <div class="bg-white border-l-4 border-green-500 shadow-lg rounded-r px-4 py-3 flex items-center">
                     <i class="fa-solid fa-circle-check text-green-500 mr-3 text-xl"></i>
-                    <div>
-                        <p class="text-sm font-bold text-slate-800">Success</p>
-                        <p class="text-xs text-slate-500" id="toast-message">Operation completed successfully.</p>
-                    </div>
+                    <p class="text-sm font-bold text-slate-800" id="toast-message">Success</p>
                 </div>
             </div>
 
-            <!-- Loader Overlay -->
             <div id="global-loader" class="hidden absolute inset-0 bg-white/80 z-40 flex items-center justify-center">
-                <div class="flex flex-col items-center">
-                    <div class="loader mb-2 w-10 h-10 border-4"></div>
-                    <p class="text-sm text-slate-500 font-medium">Connecting to server...</p>
+                <div class="loader w-10 h-10 border-4"></div>
+            </div>
+
+            <div id="edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
+                <div class="bg-white rounded-lg shadow-xl w-96 p-6">
+                    <h3 class="text-lg font-bold mb-4 text-slate-800">Update Product Price</h3>
+                    <input type="hidden" id="edit-product-id">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">New Price (₹)</label>
+                        <input type="number" id="edit-product-price" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div class="flex justify-end gap-3">
+                        <button onclick="closeEditModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+                        <button onclick="submitPriceUpdate()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Update</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- SECTIONS -->
-
-            <!-- 1. DASHBOARD SECTION -->
-            <div id="section-dashboard" class="fade-in">
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <!-- Users Card -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center">
-                        <div class="p-4 rounded-full bg-indigo-50 text-indigo-600 mr-4">
-                            <i class="fa-solid fa-users text-2xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-slate-500">Total Users</p>
-                            <h3 class="text-2xl font-bold text-slate-800" id="stat-users">0</h3>
-                        </div>
+            <div id="section-dashboard">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border flex items-center">
+                        <div class="p-4 rounded-full bg-indigo-50 text-indigo-600 mr-4"><i class="fa-solid fa-users text-2xl"></i></div>
+                        <div><p class="text-sm text-slate-500">Total Users</p><h3 class="text-2xl font-bold" id="stat-users">0</h3></div>
                     </div>
-                    <!-- Products Card -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center">
-                        <div class="p-4 rounded-full bg-emerald-50 text-emerald-600 mr-4">
-                            <i class="fa-solid fa-box-open text-2xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-slate-500">Total Products</p>
-                            <h3 class="text-2xl font-bold text-slate-800" id="stat-products">0</h3>
-                        </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border flex items-center">
+                        <div class="p-4 rounded-full bg-emerald-50 text-emerald-600 mr-4"><i class="fa-solid fa-box-open text-2xl"></i></div>
+                        <div><p class="text-sm text-slate-500">Total Products</p><h3 class="text-2xl font-bold" id="stat-products">0</h3></div>
                     </div>
-                    <!-- API Status Card -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center">
-                        <div class="p-4 rounded-full bg-orange-50 text-orange-600 mr-4">
-                            <i class="fa-solid fa-server text-2xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-slate-500">API Status</p>
-                            <h3 class="text-sm font-bold text-green-600 flex items-center">
-                                <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> Online
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                    <h3 class="text-lg font-bold text-blue-800 mb-2">Welcome Back!</h3>
-                    <p class="text-blue-600">यह आपका एडमिन पैनल है। यहाँ से आप नए प्रोडक्ट्स अपलोड कर सकते हैं और रजिस्टर्ड यूज़र्स को देख सकते हैं। डेटा सीधे आपके API से आ रहा है।</p>
                 </div>
             </div>
 
-            <!-- 2. PRODUCTS SECTION -->
-            <div id="section-products" class="hidden fade-in">
+            <div id="section-products" class="hidden">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold text-slate-700">All Products</h3>
-                    <button onclick="toggleProductForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors flex items-center">
+                    <button onclick="toggleProductForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center">
                         <i class="fa-solid fa-plus mr-2"></i> Add Product
                     </button>
                 </div>
 
-                <!-- Add Product Form (Collapsible) -->
-                <div id="product-form-container" class="hidden bg-white p-6 rounded-xl shadow-md border border-slate-200 mb-8">
-                    <h4 class="text-lg font-semibold mb-4 text-slate-800 border-b pb-2">Upload New Product</h4>
+                <div id="product-form-container" class="hidden bg-white p-6 rounded-xl shadow-md border mb-8">
+                    <h4 class="text-lg font-semibold mb-4 border-b pb-2">Upload New Product</h4>
                     <form id="addProductForm" onsubmit="handleProductSubmit(event)">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Product Name</label>
-                                <input type="text" name="productname" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="e.g. Gaming Laptop">
+                                <label class="block text-sm text-slate-700 mb-1">Product Name</label>
+                                <input type="text" name="productname" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Price (₹)</label>
-                                <input type="number" name="price" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="e.g. 50000">
+                                <label class="block text-sm text-slate-700 mb-1">Price (₹)</label>
+                                <input type="number" name="price" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                                <textarea name="description" required rows="2" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="Enter product details..."></textarea>
+                                <label class="block text-sm text-slate-700 mb-1">Description</label>
+                                <textarea name="description" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Product Link</label>
-                                <input type="url" name="productlink" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="https://example.com/item">
+                                <label class="block text-sm text-slate-700 mb-1">Product Link (Affiliate)</label>
+                                <input type="url" name="productlink" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Image Link</label>
-                                <input type="url" name="imglink" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="https://example.com/image.jpg">
+                                <label class="block text-sm text-slate-700 mb-1">Product Image (File)</label>
+                                <input type="file" name="image" accept="image/*" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50">
                             </div>
                         </div>
                         <div class="mt-6 flex justify-end gap-3">
-                            <button type="button" onclick="toggleProductForm()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm font-medium">Cancel</button>
-                            <button type="submit" id="submit-btn" class="px-6 py-2 bg-slate-900 text-white hover:bg-slate-800 rounded-lg text-sm font-medium shadow-lg flex items-center">
+                            <button type="button" onclick="toggleProductForm()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+                            <button type="submit" id="submit-btn" class="px-6 py-2 bg-slate-900 text-white hover:bg-slate-800 rounded-lg flex items-center">
                                 <span id="btn-text">Upload Product</span>
                                 <div id="btn-loader" class="loader ml-2 w-4 h-4 border-2 border-t-white hidden"></div>
                             </button>
@@ -203,64 +130,33 @@
                     </form>
                 </div>
 
-                <!-- Product Grid -->
-                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <!-- Products will be injected here via JS -->
-                </div>
-                
-                <!-- Empty State -->
-                <div id="products-empty" class="hidden text-center py-12 bg-white rounded-xl border border-dashed border-slate-300">
-                    <i class="fa-solid fa-box-open text-4xl text-slate-300 mb-3"></i>
-                    <p class="text-slate-500">No products found.</p>
-                </div>
+                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+                <div id="products-empty" class="hidden text-center py-12 bg-white rounded-xl border border-dashed"><p class="text-slate-500">No products found.</p></div>
             </div>
 
-            <!-- 3. USERS SECTION -->
-            <div id="section-users" class="hidden fade-in">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                    <h3 class="text-xl font-bold text-slate-700">Registered Users</h3>
-                    <div class="relative w-full md:w-64">
-                        <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400 text-sm"></i>
-                        <input type="text" id="user-search" onkeyup="filterUsers()" placeholder="Search username..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200">
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">ID</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">User Profile</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Mobile</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="users-table-body" class="divide-y divide-slate-100">
-                                <!-- Users will be injected here -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Empty State for Table -->
-                    <div id="users-empty" class="hidden p-8 text-center text-slate-500">
-                        No users found.
-                    </div>
+            <div id="section-users" class="hidden">
+                <h3 class="text-xl font-bold text-slate-700 mb-4">Registered Users</h3>
+                <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-50 border-b">
+                            <tr>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500">ID</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500">User</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500">Mobile</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <!-- JavaScript Logic -->
     <script>
-        const API_BASE_URL = "https://pdf-editor-vtsg.onrender.com";
-        
-        // State
-        let usersData = [];
-        let productsData = [];
+        const API_BASE_URL = "https://pdf-editor-vtsg.onrender.com"; // Your Backend URL
 
-        // DOM Elements
-        const globalLoader = document.getElementById('global-loader');
+        // --- Navigation ---
         const sections = {
             dashboard: document.getElementById('section-dashboard'),
             products: document.getElementById('section-products'),
@@ -271,279 +167,209 @@
             products: document.getElementById('nav-products'),
             users: document.getElementById('nav-users')
         };
-        const pageTitle = document.getElementById('page-title');
 
-        // --- Initialization ---
-        window.addEventListener('DOMContentLoaded', () => {
-            fetchData();
-        });
-
-        // --- Navigation Logic ---
-        function switchTab(tabName) {
-            // Update Sidebar UI
-            Object.values(navItems).forEach(el => el.classList.remove('active', 'bg-blue-600', 'text-white'));
-            navItems[tabName].classList.add('active');
-
-            // Show/Hide Sections
+        function switchTab(tab) {
             Object.values(sections).forEach(el => el.classList.add('hidden'));
-            sections[tabName].classList.remove('hidden');
-
-            // Update Title
-            const titles = {
-                dashboard: 'Dashboard Overview',
-                products: 'Product Management',
-                users: 'User Management'
-            };
-            pageTitle.textContent = titles[tabName];
-
-            // Close sidebar on mobile
-            if(window.innerWidth < 768) {
-                document.getElementById('sidebar').classList.add('hidden');
-            }
+            Object.values(navItems).forEach(el => el.classList.remove('active', 'bg-blue-600', 'text-white'));
+            
+            sections[tab].classList.remove('hidden');
+            navItems[tab].classList.add('active');
+            
+            if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('hidden');
         }
 
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('hidden');
-            sidebar.classList.toggle('absolute');
-            sidebar.classList.toggle('z-50');
-            sidebar.classList.toggle('h-full');
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('hidden'); sb.classList.toggle('absolute'); sb.classList.toggle('z-50'); sb.classList.toggle('h-full');
         }
 
         function toggleProductForm() {
-            const formContainer = document.getElementById('product-form-container');
-            formContainer.classList.toggle('hidden');
+            document.getElementById('product-form-container').classList.toggle('hidden');
         }
 
-        // --- API & Data Logic ---
+        // --- Data Fetching ---
+        window.addEventListener('DOMContentLoaded', fetchData);
 
         async function fetchData() {
-            showLoader(true);
+            document.getElementById('global-loader').classList.remove('hidden');
             try {
-                // Parallel Fetch
                 const [userRes, prodRes] = await Promise.all([
                     fetch(`${API_BASE_URL}/userdata`),
                     fetch(`${API_BASE_URL}/productdata`)
                 ]);
+                const users = await userRes.json();
+                const products = await prodRes.json();
 
-                if (!userRes.ok || !prodRes.ok) throw new Error("Server Error");
-
-                usersData = await userRes.json();
-                productsData = await prodRes.json();
-
-                // Make sure data is array
-                if (!Array.isArray(usersData)) usersData = [];
-                if (!Array.isArray(productsData)) productsData = [];
-
-                renderDashboard();
-                renderProducts();
-                renderUsers();
-
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                showToast("Failed to load data. API might be sleeping.", "error");
+                renderDashboard(users, products);
+                renderUsers(users);
+                renderProducts(products);
+            } catch (err) {
+                console.error(err);
+                showToast("Error loading data", "error");
             } finally {
-                showLoader(false);
+                document.getElementById('global-loader').classList.add('hidden');
             }
         }
 
-        // --- Rendering Logic ---
-
-        function renderDashboard() {
-            // Animate numbers
-            animateValue("stat-users", 0, usersData.length, 1000);
-            animateValue("stat-products", 0, productsData.length, 1000);
+        function renderDashboard(users, products) {
+            document.getElementById('stat-users').innerText = users.length || 0;
+            document.getElementById('stat-products').innerText = products.length || 0;
         }
 
-        function renderProducts() {
+        function renderUsers(users) {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = users.map(u => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 text-sm text-slate-500">#${u.id}</td>
+                    <td class="px-6 py-4 text-sm font-medium text-slate-800">${u.username || 'Unknown'}</td>
+                    <td class="px-6 py-4 text-sm text-slate-600 font-mono">${u.mobile || 'N/A'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderProducts(products) {
             const grid = document.getElementById('products-grid');
-            const emptyState = document.getElementById('products-empty');
+            const empty = document.getElementById('products-empty');
             
-            grid.innerHTML = '';
-            
-            if (productsData.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            } else {
-                emptyState.classList.add('hidden');
+            if (!products || products.length === 0) {
+                grid.innerHTML = ''; empty.classList.remove('hidden'); return;
             }
+            empty.classList.add('hidden');
 
-            productsData.forEach(product => {
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col";
-                card.innerHTML = `
+            grid.innerHTML = products.map(p => `
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
                     <div class="h-48 w-full bg-slate-100 relative group overflow-hidden">
-                        <img src="${product.imglink}" onerror="this.src='https://placehold.co/400x300?text=No+Image'" alt="${product.productname}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <a href="${product.productlink}" target="_blank" class="bg-white text-slate-900 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transform translate-y-4 group-hover:translate-y-0 transition-transform">Visit Link</a>
-                        </div>
+                        <img src="${p.imglink}" onerror="this.src='https://placehold.co/400x300?text=No+Image'" class="w-full h-full object-cover">
                     </div>
                     <div class="p-4 flex flex-col flex-grow">
                         <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-slate-800 line-clamp-1" title="${product.productname}">${product.productname}</h4>
-                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded">ID: ${product.id}</span>
+                            <h4 class="font-bold text-slate-800 line-clamp-1">${p.productname}</h4>
                         </div>
-                        <p class="text-sm text-slate-500 line-clamp-2 mb-4 flex-grow">${product.description}</p>
-                        <div class="pt-3 border-t border-slate-100 flex justify-between items-center mt-auto">
-                            <span class="text-lg font-bold text-blue-600">₹${product.price}</span>
+                        <p class="text-sm text-slate-500 line-clamp-2 mb-4">${p.description}</p>
+                        <div class="mt-auto flex justify-between items-center border-t pt-3">
+                            <span class="text-lg font-bold text-blue-600">₹${p.price}</span>
+                            <div class="flex gap-2">
+                                <button onclick="openEditModal(${p.id}, ${p.price})" class="text-blue-500 hover:bg-blue-50 p-2 rounded-full" title="Edit Price">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button onclick="deleteProduct(${p.id})" class="text-red-500 hover:bg-red-50 p-2 rounded-full" title="Delete">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                `;
-                grid.appendChild(card);
-            });
+                </div>
+            `).join('');
         }
 
-        function renderUsers() {
-            const tbody = document.getElementById('users-table-body');
-            const emptyState = document.getElementById('users-empty');
-            tbody.innerHTML = '';
-
-            if (usersData.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            } else {
-                emptyState.classList.add('hidden');
-            }
-
-            usersData.forEach(user => {
-                const initial = user.username ? user.username.charAt(0).toUpperCase() : '?';
-                const row = document.createElement('tr');
-                row.className = "hover:bg-slate-50 transition-colors";
-                row.innerHTML = `
-                    <td class="px-6 py-4 text-sm text-slate-500">#${user.id}</td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 text-white flex items-center justify-center font-bold mr-3 shadow-sm text-sm">
-                                ${initial}
-                            </div>
-                            <span class="text-sm font-medium text-slate-800">${user.username || 'Unknown'}</span>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-slate-600 font-mono">${user.mobile || 'N/A'}</td>
-                    <td class="px-6 py-4">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            Active
-                        </span>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        // --- Filter Users ---
-        function filterUsers() {
-            const input = document.getElementById('user-search').value.toLowerCase();
-            const rows = document.getElementById('users-table-body').getElementsByTagName('tr');
-
-            for (let i = 0; i < rows.length; i++) {
-                const nameCell = rows[i].getElementsByTagName('td')[1];
-                if (nameCell) {
-                    const txtValue = nameCell.textContent || nameCell.innerText;
-                    if (txtValue.toLowerCase().indexOf(input) > -1) {
-                        rows[i].style.display = "";
-                    } else {
-                        rows[i].style.display = "none";
-                    }
-                }
-            }
-        }
-
-        // --- Form Submission (POST) ---
+        // --- Upload Product (Modified for Multipart) ---
         async function handleProductSubmit(e) {
             e.preventDefault();
             const form = e.target;
             const btn = document.getElementById('submit-btn');
             const loader = document.getElementById('btn-loader');
-            const btnText = document.getElementById('btn-text');
-
-            // UI Loading State
-            btn.disabled = true;
-            btnText.textContent = "Uploading...";
-            loader.classList.remove('hidden');
+            
+            btn.disabled = true; loader.classList.remove('hidden');
 
             const formData = new FormData(form);
-            const payload = {
+            
+            // Backend expects 2 parts: 'product' (JSON) and 'image' (File)
+            const apiData = new FormData();
+
+            // 1. Image Part
+            const imageFile = formData.get('image');
+            apiData.append('image', imageFile);
+
+            // 2. Product JSON Part
+            const productJson = {
                 productname: formData.get('productname'),
                 description: formData.get('description'),
                 productlink: formData.get('productlink'),
-                imglink: formData.get('imglink'),
-                price: parseFloat(formData.get('price')) // Ensure price is number
+                price: parseFloat(formData.get('price'))
             };
+            
+            // Append JSON as a Blob with application/json type
+            apiData.append('product', new Blob([JSON.stringify(productJson)], {
+                type: 'application/json'
+            }));
 
             try {
-                const response = await fetch(`${API_BASE_URL}/productdata`, {
+                const res = await fetch(`${API_BASE_URL}/productdata`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
+                    body: apiData // No Content-Type header manually, fetch does it for FormData
                 });
 
-                if (response.ok) {
-                    showToast("Product uploaded successfully!", "success");
+                if (res.ok) {
+                    showToast("Product Uploaded!", "success");
                     form.reset();
                     toggleProductForm();
-                    fetchData(); // Refresh list
+                    fetchData();
                 } else {
-                    throw new Error("Failed to upload");
+                    throw new Error("Upload Failed");
                 }
-            } catch (error) {
-                showToast("Error uploading product.", "error");
-                console.error(error);
+            } catch (err) {
+                showToast("Failed to upload", "error");
+                console.error(err);
             } finally {
-                btn.disabled = false;
-                btnText.textContent = "Upload Product";
-                loader.classList.add('hidden');
+                btn.disabled = false; loader.classList.add('hidden');
             }
         }
 
-        // --- Utilities ---
-        
-        function showLoader(show) {
-            if (show) globalLoader.classList.remove('hidden');
-            else globalLoader.classList.add('hidden');
-        }
+        // --- Delete Product ---
+        async function deleteProduct(id) {
+            if(!confirm("Are you sure you want to delete this product?")) return;
 
-        function showToast(message, type) {
-            const toast = document.getElementById('toast');
-            const msgEl = document.getElementById('toast-message');
-            const icon = toast.querySelector('i');
-
-            msgEl.textContent = message;
-            
-            // Set Color
-            if (type === 'error') {
-                toast.querySelector('.border-l-4').className = 'bg-white border-l-4 border-red-500 shadow-lg rounded-r px-4 py-3 flex items-center';
-                icon.className = 'fa-solid fa-circle-exclamation text-red-500 mr-3 text-xl';
-            } else {
-                toast.querySelector('.border-l-4').className = 'bg-white border-l-4 border-green-500 shadow-lg rounded-r px-4 py-3 flex items-center';
-                icon.className = 'fa-solid fa-circle-check text-green-500 mr-3 text-xl';
+            try {
+                const res = await fetch(`${API_BASE_URL}/productdata/${id}`, { method: 'DELETE' });
+                if(res.ok) {
+                    showToast("Product Deleted", "success");
+                    fetchData();
+                } else throw new Error("Delete failed");
+            } catch(err) {
+                showToast("Could not delete", "error");
             }
-
-            // Show
-            toast.classList.remove('translate-x-full', 'opacity-0');
-            
-            // Hide after 3s
-            setTimeout(() => {
-                toast.classList.add('translate-x-full', 'opacity-0');
-            }, 3000);
         }
 
-        // Number Counter Animation
-        function animateValue(id, start, end, duration) {
-            if (start === end) return;
-            const range = end - start;
-            let current = start;
-            const increment = end > start ? 1 : -1;
-            const stepTime = Math.abs(Math.floor(duration / range));
-            const obj = document.getElementById(id);
-            const timer = setInterval(function() {
-                current += increment;
-                obj.innerHTML = current;
-                if (current == end) {
-                    clearInterval(timer);
-                }
-            }, stepTime);
+        // --- Edit Price Logic ---
+        function openEditModal(id, currentPrice) {
+            document.getElementById('edit-product-id').value = id;
+            document.getElementById('edit-product-price').value = currentPrice;
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        async function submitPriceUpdate() {
+            const id = document.getElementById('edit-product-id').value;
+            const price = document.getElementById('edit-product-price').value;
+
+            if(!price) return alert("Enter a price");
+
+            try {
+                // Backend: PUT /productdata/{id}/price?price=XX
+                const res = await fetch(`${API_BASE_URL}/productdata/${id}/price?price=${price}`, {
+                    method: 'PUT'
+                });
+
+                if(res.ok) {
+                    showToast("Price Updated", "success");
+                    closeEditModal();
+                    fetchData();
+                } else throw new Error("Update failed");
+            } catch(err) {
+                showToast("Update Failed", "error");
+            }
+        }
+
+        // --- Toast Util ---
+        function showToast(msg, type) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            t.querySelector('i').className = type === 'error' ? 'fa-solid fa-circle-exclamation text-red-500 mr-3 text-xl' : 'fa-solid fa-circle-check text-green-500 mr-3 text-xl';
+            t.classList.remove('translate-x-full', 'opacity-0');
+            setTimeout(() => t.classList.add('translate-x-full', 'opacity-0'), 3000);
         }
     </script>
 </body>
